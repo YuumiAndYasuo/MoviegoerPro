@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    tools:context=".PlayActivity">
+
+
+    <!--播放-->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <VideoView
+            android:id="@+id/videoview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+    </RelativeLayout>
+
+    <!--垂直滚动视图-->
+    <ScrollView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <!--选集-->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+            </LinearLayout>
+
+            <!--视频详情-->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="25dp"
+                android:orientation="vertical">
+                <!--视频标题-->
+                <TextView
+                    android:id="@+id/videoname"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:textSize="20sp"
+                    android:text="喜羊羊与灰太狼之虎虎生威"/>
+
+                <!--封面及类型之类的-->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="250dp"
+                    android:orientation="horizontal">
+                    <!--视频封面-->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+                        <ImageView
+                            android:id="@+id/videocover"
+                            android:layout_width="150dp"
+                            android:layout_height="220dp"/>
+                    </LinearLayout>
+                    <!--类型地区语言导演主演之类的，共两行-->
+                    <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal">
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="类型："/>
+                                <TextView
+                                    android:id="@+id/videotype"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="20dp"
+                                    android:text="动漫片"/>
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal">
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="地区："/>
+                                <TextView
+                                    android:id="@+id/videoarea"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="20dp"
+                                    android:text="大陆"/>
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal">
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="语言："/>
+                                <TextView
+                                    android:id="@+id/videolanguage"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="20dp"
+                                    android:text="国语"/>
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal">
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="导演："/>
+                                <TextView
+                                    android:id="@+id/videodirector"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="20dp"
+                                    android:text="赵崇邦"/>
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal">
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="主演："/>
+                                <TextView
+                                    android:id="@+id/videoactors"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="20dp"
+                                    android:maxLength="15"
+                                    android:text="谢天华,王祖蓝,邓丽欣,麦长青"/>
+                            </LinearLayout>
+
+
+                        </LinearLayout>
+
+
+                </LinearLayout>
+                <!--简介-->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+                    <!--简介标题-->
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:textSize="20sp"
+                        android:text="简介"/>
+                    <!--简介内容-->
+                    <TextView
+                        android:id="@+id/videointroduce"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:textSize="18sp"
+                        android:text="在一个月黑风高的夜晚，灰太狼（张琳 配音）和一众同伴相约，杀进羊村捕捉小肥羊，为老婆和孩子送上情人节的饕餮大宴——涮羊锅。与此同时，羊村正在举行大白菜成功培育一千周年的庆典，节日的欢乐气氛却被突如其来的灰太狼所破坏。正当灰太狼与喜羊羊（祖丽晴 配音）激战正酣之际，狂暴骄纵的虎威太岁（贾译 配音）率领众多手下来到羊村，扬言要在这里修建游乐场。转眼之间一座豪华的游乐场拔地而起，小肥羊们被迫沦为这里的工人，连高傲自大的灰太狼也难以幸免。面对这个突如其来的虎威太岁，羊羊和灰太狼被迫联手……本片荣获2010年第十六届上海电视节国产动画片白玉兰金奖、2010第七届金龙奖最佳动画长片奖等多个奖项。"/>
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+
+
+
+
+
+</LinearLayout>
