@@ -4,17 +4,23 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
+import android.app.Application;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.graphics.Color;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
+import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.MediaController;
@@ -24,6 +30,8 @@ import android.widget.Toast;
 import android.widget.VideoView;
 
 import com.bumptech.glide.Glide;
+import com.danikula.videocache.HttpProxyCacheServer;
+import com.example.moviegoerpro.Base.PlayLink;
 import com.example.moviegoerpro.Base.VideoDetail;
 import com.example.moviegoerpro.Base.VideoInfo;
 import com.example.moviegoerpro.Utils.HttpUtil;
@@ -43,6 +51,7 @@ public class PlayActivity extends AppCompatActivity {
     private myGestureDetector myGestureDetector;
     MediaController mediaController;
     boolean screen_vertical=true;
+    private int curIndex;               //切出页面时的播放进度
 
     private ImageView coverimg;
     private VideoView videoView;
@@ -53,6 +62,7 @@ public class PlayActivity extends AppCompatActivity {
     private TextView videoarea;
     private TextView videolanguage;
     private TextView videointroduce;
+    private TextView playnum;
 /**
  * 香港卫视：http://live.hkstv.hk.lxdns.com/live/hks/playlist.m3u8
  * CCTV1高清：http://ivi.bupt.edu.cn/hls/cctv1hd.m3u8
@@ -75,7 +85,6 @@ public class PlayActivity extends AppCompatActivity {
         Intent intent=getIntent();
         final String videoDetailUrl=intent.getStringExtra("url");
 
-        //请求视频详细信息
         HttpUtil.get(videoDetailUrl, new Callback() {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
@@ -94,7 +103,7 @@ public class PlayActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         //获取视频详细信息
-                        VideoDetail videoDetail=ParseHtml.parsedetailinfo(html);
+                        final VideoDetail videoDetail=ParseHtml.parsedetailinfo(html);
                         //获取各个控件
                         coverimg=(ImageView)findViewById(R.id.videocover);
                         videoView=findViewById(R.id.videoview);
@@ -105,31 +114,87 @@ public class PlayActivity extends AppCompatActivity {
                         videoarea=findViewById(R.id.videoarea);
                         videolanguage=findViewById(R.id.videolanguage);
                         videointroduce=findViewById(R.id.videointroduce);
+                        playnum=findViewById(R.id.playnum);
 
+                        //设置播放列表
+                        final GridLayout gridLayout=(GridLayout)findViewById(R.id.gridlayout);
+                        GridLayout.LayoutParams params = null;
+                        int screenWidth = getWindowManager().getDefaultDisplay().getWidth();
+                        final ArrayList<PlayLink> tmp=videoDetail.getPlaylists_mp4();
+                        int length=tmp.size();
+                        int i,j,k=0;
+                        for(i=0;i<length/4+1;i++){
+                            for(j=0;j<4;j++){
+                                if(k>=length){
+                                    break;
+                                }
+                                final Button button=new Button(PlayActivity.this);
+                                button.setText(tmp.get(k).getVideonum());
+                                button.setWidth((screenWidth-60)/4);
+                                if(k==0){
+                                    button.setBackgroundColor(Color.parseColor("#fb7299"));
+                                }
+//                                button.
+                                //设置行
+                                GridLayout.Spec rowSpec=GridLayout.spec(i);
+                                //设置列
+                                GridLayout.Spec columnSpec=GridLayout.spec(j);
+                                params=new GridLayout.LayoutParams(rowSpec,columnSpec);
+                                params.setMargins(5, 5, 5, 5);
+                                final int index=k;
+
+                                button.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        Log.d("**********************", "onClick: "+tmp.get(index).getVideourl());
+                                        HttpProxyCacheServer proxyCacheServer= com.example.moviegoerpro.Utils.App.getProxy(getApplicationContext());
+                                        String proxyUrl=proxyCacheServer.getProxyUrl(tmp.get(index).getVideourl());
+                                        videoView.setVideoPath(proxyUrl);
+                                        for (int i = 0; i < gridLayout.getChildCount(); i++) {//清空所有背景色
+                                            Button b = (Button) gridLayout.getChildAt(i);
+                                            b.setBackgroundColor(Color.parseColor("#d6d7d7"));
+                                        }
+                                        //设置选中的按钮背景色
+                                        button.setBackgroundColor(Color.parseColor("#fb7299"));
+                                        playnum.setText(tmp.get(index).getVideonum());
+                                        Toast.makeText(PlayActivity.this,"正在加载"+tmp.get(index).getVideonum(),Toast.LENGTH_SHORT).show();
+                                        videoView.requestFocus();
+                                        videoView.start();
+                                    }
+                                });
+                                gridLayout.addView(button,params);
+                                k++;
+                            }
+                        }
                         //设置各控件内容
                         Glide.with(PlayActivity.this).load(videoDetail.getCoverimage()).into(coverimg);
                         videoView.setClickable(true);
-                        videoView.setVideoPath(videoDetail.getPlaylists_m3u8().get(0).getVideourl());
+                        //使用代理缓存视频，提高播放效果
+                        HttpProxyCacheServer proxyCacheServer= com.example.moviegoerpro.Utils.App.getProxy(getApplicationContext());
+                        String proxyUrl=proxyCacheServer.getProxyUrl(videoDetail.getPlaylists_mp4().get(0).getVideourl());
+                        videoView.setVideoPath(proxyUrl);
                         videotype.setText(videoDetail.getVideotype());
                         videoname.setText(videoDetail.getVideoname());
                         videodirector.setText(videoDetail.getDirector());
                         videoactors.setText(videoDetail.getActors());
                         videoarea.setText(videoDetail.getArea());
                         videolanguage.setText(videoDetail.getLanguage());
-                        videointroduce.setText(videoDetail.getIntroduce());
+                        videointroduce.setText("\u3000\u3000" +videoDetail.getIntroduce());
+
 
                         // 创建MediaController对象
                         mediaController = new MediaController(PlayActivity.this);
                         //VideoView与MediaController建立关联
                         videoView.setMediaController(mediaController);
                         videoView.requestFocus();
-//                        videoView.start();
+//                        videoView.seekTo(300);
+                        videoView.pause();
                     }
                 });
 
 
-                    }
-                });
+            }
+        });
 
         myGestureDetector=new myGestureDetector();
         gestureDetector=new GestureDetector(getApplicationContext(),myGestureDetector);
@@ -139,6 +204,28 @@ public class PlayActivity extends AppCompatActivity {
         if (actionBar != null) {
             actionBar.hide();
         }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (mediaController != null && videoView.isPlaying())
+        {
+            curIndex = videoView.getCurrentPosition();
+            videoView.pause();
+
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(videoView!=null){
+            videoView.seekTo(curIndex);
+            videoView.requestFocus();
+            videoView.start();
+        }
+
     }
 
     @Override
@@ -153,6 +240,7 @@ public class PlayActivity extends AppCompatActivity {
 
     //正常播放
     private void convertToPortScreen() {
+        screen_vertical=true;
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);//设置videoView竖屏播放
         VideoView videoView=findViewById(R.id.videoview);
@@ -166,6 +254,7 @@ public class PlayActivity extends AppCompatActivity {
 
     //全屏播放
     private void convertToLandScreen() {
+        screen_vertical=false;
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);//设置videoView全屏播放
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);//设置videoView横屏播放
         VideoView videoView=findViewById(R.id.videoview);
@@ -186,6 +275,8 @@ public class PlayActivity extends AppCompatActivity {
     public void onBackPressed() {
         if(!screen_vertical){
             convertToPortScreen();
+        }else {
+            this.finish();
         }
     }
 
@@ -216,10 +307,8 @@ public class PlayActivity extends AppCompatActivity {
             Toast.makeText(BaseApplication.getContext(),"长按",Toast.LENGTH_SHORT).show();
             if(screen_vertical){//切换到全屏播放
                 convertToLandScreen();
-                screen_vertical=false;
             }else {//退出全屏播放
                 convertToPortScreen();
-                screen_vertical=true;
             }
 
             super.onLongPress(e);
@@ -322,10 +411,10 @@ public class PlayActivity extends AppCompatActivity {
         public boolean onDoubleTap(MotionEvent e) {
 //            Toast.makeText(BaseApplication.getContext(),"双击",Toast.LENGTH_SHORT).show();
             if(videoView.isPlaying()){
-                Toast.makeText(BaseApplication.getContext(),"暂停播放"+videoView.isPlaying(),Toast.LENGTH_SHORT).show();
+                Toast.makeText(BaseApplication.getContext(),"暂停播放",Toast.LENGTH_SHORT).show();
                 videoView.pause();
             }else {
-                Toast.makeText(BaseApplication.getContext(),"继续播放"+videoView.isPlaying(),Toast.LENGTH_SHORT).show();
+                Toast.makeText(BaseApplication.getContext(),"继续播放",Toast.LENGTH_SHORT).show();
                 videoView.start();
             }
             return super.onDoubleTap(e);
@@ -366,7 +455,6 @@ public class PlayActivity extends AppCompatActivity {
             return displayMetrics.heightPixels;
         }
     }
-
 
 }
 

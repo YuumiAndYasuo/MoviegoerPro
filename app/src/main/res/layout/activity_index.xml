@@ -22,7 +22,7 @@
             android:maxLines="1"
             android:maxLength="15"
             android:gravity="center"
-            android:text="柯南"/>
+            android:text="喜羊羊"/>
         <!--搜索按钮-->
         <Button
             android:id="@+id/search_button"

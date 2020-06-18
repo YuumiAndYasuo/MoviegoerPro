@@ -41,6 +41,10 @@ public class ParseHtml {
         i=0;
         ArrayList<VideoInfo> searchresult=new ArrayList<VideoInfo>();
         for (Element element:elements){
+            if(arrayList.get(i).toString().equals("福利片")){
+                i++;
+                continue;
+            }
             Elements titleEle=element.select("a");
 //            System.out.println("影片名称："+titleEle.text());
 //            System.out.println("影片链接："+titleEle.attr("href"));
@@ -67,28 +71,35 @@ public class ParseHtml {
 
         VideoDetail videoDetail=new VideoDetail();
         Elements videoname=document.select(".vodh h2");
-        System.out.println("影片名称："+videoname.text());
+//        System.out.println("影片名称："+videoname.text());
         Elements director=document.select(".vodinfobox li:nth-child(2) span");
-        System.out.println("影片导演："+director.text());
+//        System.out.println("影片导演："+director.text());
         Elements actors=document.select(".vodinfobox li:nth-child(3) span");
-        System.out.println("影片主演："+actors.text());
+//        System.out.println("影片主演："+actors.text());
         Elements videotype=document.select(".vodinfobox li:nth-child(4) span");
-        System.out.println("影片类型："+videotype.text());
+//        System.out.println("影片类型："+videotype.text());
         Elements area=document.select(".vodinfobox li:nth-child(5) span");
-        System.out.println("影片地区："+area.text());
+//        System.out.println("影片地区："+area.text());
         Elements language=document.select(".vodinfobox li:nth-child(6) span");
-        System.out.println("影片语言："+language.text());
+//        System.out.println("影片语言："+language.text());
         Elements introduce=document.select(".vodinfobox li.cont span.more");
-        System.out.println("影片简介："+introduce.text());
+//        System.out.println("影片简介："+introduce.text());
         Elements coverimg=document.select(".warp div:nth-child(1) .vodImg img");
-        System.out.println("影片封面："+coverimg.attr("src"));
+//        System.out.println("影片封面："+coverimg.attr("src"));
 
-        //获取m3u9播放链接
+        //获取m3u8播放链接
         Elements elements=document.select("#play_1 ul li");
-        int i=0;
         for(Element element:elements){
             String []content=element.text().split("\\$");
             videoDetail.getPlaylists_m3u8().add(new PlayLink(content[0],content[1]));
+            System.out.println(element.text());
+        }
+
+        //获取mp4播放链接
+        elements=document.select("#down_1 ul li");
+        for(Element element:elements){
+            String []content=element.text().split("\\$");
+            videoDetail.getPlaylists_mp4().add(new PlayLink(content[0],content[1]));
             System.out.println(element.text());
         }
 
